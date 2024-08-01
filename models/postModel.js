@@ -13,20 +13,37 @@ const postSchema = new mongoose.Schema({
     minLenght: [5, "A post body must not be less than 5"],
     required: [true, "A post must have a body"],
   },
-  user: {
-    type: String,
-    required: [true, "A post must have a user that posted it"],
+  author: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: [true, "A post must have an author"],
   },
-  comments: [
-    {
-      type: String,
-    },
-  ],
   createdAt: {
     type: Date,
     default: Date.now,
     required: true,
   },
+},
+{
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+}
+);
+
+
+postSchema.virtual("comments", {
+  ref: "Comment",
+  foreignField: "post",
+  localField: "_id",
+});
+
+postSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "author",
+    select: "name email",
+  });
+
+  next();
 });
 
 const Post = mongoose.model("Post", postSchema);

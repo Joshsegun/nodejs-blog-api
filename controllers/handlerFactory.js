@@ -14,9 +14,12 @@ exports.getAll = (Model) =>
     });
   });
 
-exports.getOne = (Model) =>
+exports.getOne = (Model,populateOptions) =>
   asyncHandler(async (req, res, next) => {
-    const doc = await Model.findById(req.params.id);
+    let query = await Model.findById(req.params.id)
+    if(populateOptions) query = query.populate(populateOptions)
+
+    const doc = await query
 
     if (!doc)
       return next(

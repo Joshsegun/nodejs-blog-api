@@ -16,22 +16,23 @@ const ErrorHandler = require("../utils/errorHandler");
 // });
 
 exports.getAllPosts = factory.getAll(Post);
+exports.getPost = factory.getOne(Post, {path : 'comments'})
 
-exports.getPost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findById(req.params.id);
+// exports.getPost = asyncHandler(async (req, res, next) => {
+//   const post = await Post.findById(req.params.id).populate("comments");
 
-  if (!post)
-    return next(
-      new ErrorHandler("The post with this given id cannot be found", 401)
-    );
+//   if (!post)
+//     return next(
+//       new ErrorHandler("The post with this given id cannot be found", 401)
+//     );
 
-  res.status(200).json({
-    status: "success",
-    data: {
-      post,
-    },
-  });
-});
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       post,
+//     },
+//   });
+// });
 
 exports.createPost = asyncHandler(async (req, res, next) => {
   const post = await Post.create(req.body);

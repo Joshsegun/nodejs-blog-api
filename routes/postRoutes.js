@@ -11,14 +11,16 @@ const router = express.Router();
 
 router.use("/:postId/comments", commentRouter);
 
+router.use(authController.authenticate);
+
 router
   .route("/")
-  .get(authController.authenticate, postController.getAllPosts)
+  .get(postController.getAllPosts)
   .post(postController.createPost);
 
 router
   .route("/:id")
-  .get(authController.authenticate, postController.getPost)
+  .get(postController.getPost)
   .patch(postController.updatePost)
   .delete(postController.deletePost);
 

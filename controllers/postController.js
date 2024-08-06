@@ -16,7 +16,7 @@ const ErrorHandler = require("../utils/errorHandler");
 // });
 
 exports.getAllPosts = factory.getAll(Post);
-exports.getPost = factory.getOne(Post, {path : 'comments'})
+exports.getPost = factory.getOne(Post, { path: "comments" });
 
 // exports.getPost = asyncHandler(async (req, res, next) => {
 //   const post = await Post.findById(req.params.id).populate("comments");
@@ -35,7 +35,11 @@ exports.getPost = factory.getOne(Post, {path : 'comments'})
 // });
 
 exports.createPost = asyncHandler(async (req, res, next) => {
-  const post = await Post.create(req.body);
+  const post = await Post.create({
+    title: req.body.title,
+    body: req.body.body,
+    author: req.user._id,
+  });
 
   res.status(201).json({
     status: "success",
@@ -53,7 +57,12 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
   if (!post)
     return next(
-      new ErrorHandler("The post with this given id cannot be found", 401)
+      new ErrorHandler("The post with this given id cannot be found", 404)
+    );
+
+  if (post.author._id.toString() !== req.user._id.toString())
+    return next(
+      new ErrorHandler("You can only update a post you created", 401)
     );
 
   res.status(200).json({
@@ -65,12 +74,19 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 });
 
 exports.deletePost = asyncHandler(async (req, res, next) => {
-  const post = await Post.findByIdAndDelete(req.params.id);
+  const post = await Post.findById(req.params.id);
 
   if (!post)
     return next(
       new ErrorHandler("The post with this given id cannot be found", 401)
     );
+
+  if (post.author._id.toString() !== req.user._id.toString())
+    return next(
+      new ErrorHandler("You can only delete a post you created", 401)
+    );
+
+  await post.deleteOne();
 
   res.status(200).json({
     status: "success",

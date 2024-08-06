@@ -24,11 +24,13 @@ const userSchema = new mongoose.Schema(
     followers: [
       {
         type: mongoose.Schema.ObjectId,
+        ref: "User",
       },
     ],
     followings: [
       {
         type: mongoose.Schema.ObjectId,
+        ref: "User",
       },
     ],
     createdAt: {
@@ -46,7 +48,7 @@ userSchema.pre("save", async function (next) {
   //If the password hasn't been modified, skip
   if (!this.isModified("password")) return next();
 
-  //Hashing passwordn
+  //Hashing password
   this.password = await bcrypt.hash(this.password, 12);
 
   next();
@@ -64,6 +66,14 @@ userSchema.virtual("posts", {
   foreignField: "author",
   localField: "_id",
 });
+
+// userSchema.virtual("followersCount").get(function () {
+//   return this.followers.length;
+// });
+
+// userSchema.virtual("followingsCount").get(function () {
+//   return this.followings.length;
+// });
 
 const User = mongoose.model("User", userSchema);
 

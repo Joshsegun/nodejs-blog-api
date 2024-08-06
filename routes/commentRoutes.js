@@ -4,14 +4,12 @@ const authController = require("../controllers/authController");
 
 const router = express.Router({ mergeParams: true });
 
+router.use(authController.authenticate);
+
 router
   .route("/")
   .get(commentController.getAllComments)
-  .post(
-    authController.authenticate,
-    commentController.setPostAndUserId,
-    commentController.createComment
-  );
+  .post(commentController.setPostAndUserId, commentController.createComment);
 
 router
   .route("/:id")
